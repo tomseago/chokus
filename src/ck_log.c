@@ -8,7 +8,7 @@
 
 #define NO_EXTERN_LOGGING_DEFS 1
 
-#include <chokus.h>
+#include "chokus.h"
 
 #include <stdio.h>
 

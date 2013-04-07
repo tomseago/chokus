@@ -5,8 +5,8 @@ int main(int argc, char** argv)
 {
     int ret = 0;
     
-    gParseOpts(argc, argv);
-    if ((ret = gLoadConfig()) != 0)
+    ck_parseOpts(argc, argv);
+    if ((ret = ck_loadConfig()) != 0)
     {
         ck_err("Loading the config failed");
         return -1;

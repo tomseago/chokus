@@ -68,7 +68,7 @@ void usage(void* argtable[])
 }
 
 
-void gParseOpts(int argc, char** argv)
+void ck_parseOpts(int argc, char** argv)
 {
     int nerrors = 0;
     
@@ -203,7 +203,7 @@ int loadConfigFileS(const char* filename)
 /**
  * Loads all configuration files, one after another
  */
-int gLoadConfig()
+int ck_loadConfig()
 {
 //    loadConfigFileS("/etc/chokus.yaml");
 //    loadConfigFileS("/etc/chokus/config.yaml");
