@@ -119,7 +119,10 @@ void ck_parseOpts(int argc, char** argv)
     // Log everything
     ck_trace("debug level %d", gLogLevel);
     ck_trace("foreground = %s", STRING_FROM_BOOL(gOptions.foreground));
-    ck_trace("config file = %s", gOptions.configFilename->data);
+    if(gOptions.configFilename) 
+    {
+        ck_trace("config file = %s", gOptions.configFilename->data);
+    }
     
 }
 
