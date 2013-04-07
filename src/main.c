@@ -1,11 +1,18 @@
-#include <config.h>
-#include <stdio.h>
+#include "chokus.h"
+#include "ck_config.h"
 
-int
-main(void)
+int main(int argc, char** argv)
 {
-	puts("Hello World!");
-	puts("This is " PACKAGE_STRING ".");
+    int ret = 0;
+    
+    gParseOpts(argc, argv);
+    if ((ret = gLoadConfig()) != 0)
+    {
+        ck_err("Loading the config failed");
+        return -1;
+    }
+    
+    
 	return 0;
 }
 
