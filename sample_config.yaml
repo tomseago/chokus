@@ -1,0 +1,32 @@
+%YAML 1.1
+---
+network:
+  filters:
+    default:
+      allow:
+        - 10.0.0.0/24
+        - 10.0.1.0/24
+      else: deny
+
+    usc:
+      allow:
+        - 128.129.0.0/16
+      else: deny
+
+  bind:
+    host: localhost
+    port: 2000
+
+logging:
+  syslog:
+    enabled: true
+    level: error
+  console:
+    enabled: true
+    level: debug
+
+operations:
+  login:
+    elapsed_time: 10s
+    on_failure: wait
+
