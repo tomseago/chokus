@@ -9,8 +9,8 @@
 #ifndef ck_config_h
 #define ck_config_h
 
-void ck_parseOpts(int argc, char** argv);
-int ck_loadConfig();
+void ckConfig_ParseOpts(int argc, char** argv);
+int ckConfig_LoadConfig();
 
 
 

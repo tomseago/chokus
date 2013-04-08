@@ -11,14 +11,15 @@
 #include "chokus.h"
 
 #include <stdio.h>
+#include <sys/time.h>
 
 int gLogLevel;
 
-ck_bool syslogEnabled = FALSE;
-ck_logLevel syslogLevel = CK_LL_TRACE;
+ckBool syslogEnabled = FALSE;
+ckLogLevel syslogLevel = CKLL_TRACE;
 
-ck_bool consoleEnabled = TRUE;
-ck_logLevel consoleLevel = CK_LL_TRACE;
+ckBool consoleEnabled = TRUE;
+ckLogLevel consoleLevel = CKLL_TRACE;
 
 char* gLevels[] = {
     "ERROR",
@@ -28,21 +29,33 @@ char* gLevels[] = {
     "TRACE"
 };
 
-void ck_log(ck_logLevel level, const char* format, ...)
+
+ckTime ck_Now()
+{
+    struct timeval st;
+    
+    gettimeofday(&st, NULL);
+    
+    return (st.tv_sec * CKTIME_1SEC) + st.tv_usec;
+}
+
+
+
+void ckLog_Log(ckLogLevel level, const char* format, ...)
 {
     va_list list;
     
     // Sanity checking
     if (!format) return;
-    if ((level < CK_LL_ERR) || (level > CK_LL_TRACE))
+    if ((level < CKLL_ERR) || (level > CKLL_TRACE))
     {
-        level = CK_LL_TRACE;
+        level = CKLL_TRACE;
     }
 
     va_start(list, format);
 
     // Write to stdout
-    if (consoleEnabled && level >= consoleLevel)
+    if (consoleEnabled && level <= consoleLevel)
     {
         // Format out the time
         // TODO - that^
@@ -59,22 +72,22 @@ void ck_log(ck_logLevel level, const char* format, ...)
     va_end(list);
 }
 
-void ck_enableSyslog(ck_bool enabled)
+void ckLog_EnableSyslog(ckBool enabled)
 {
     syslogEnabled = enabled;
 }
 
-void ck_setSyslogLevel(ck_logLevel level)
+void ckLog_SetSyslogLevel(ckLogLevel level)
 {
     syslogLevel = level;
 }
 
-void ck_enableConsole(ck_bool enabled)
+void ckLog_EnableConsole(ckBool enabled)
 {
     consoleEnabled = enabled;
 }
 
-void ck_setConsoleLevel(ck_logLevel level)
+void ckLog_SetConsoleLevel(ckLogLevel level)
 {
     consoleLevel = level;
 }

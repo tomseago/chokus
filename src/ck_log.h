@@ -9,9 +9,9 @@
 #ifndef ck_log_h
 #define ck_log_h
 
-extern void ck_enableSyslog(ck_bool enabled);
-extern void ck_setSyslogLevel(ck_logLevel level);
-extern void ck_enableConsole(ck_bool enabled);
-extern void ck_setConsoleLevel(ck_logLevel level);
+extern void ckLog_EnableSyslog(ckBool enabled);
+extern void ckLog_SetSyslogLevel(ckLogLevel level);
+extern void ckLog_EnableConsole(ckBool enabled);
+extern void ckLog_SetConsoleLevel(ckLogLevel level);
 
 #endif

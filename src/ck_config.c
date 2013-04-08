@@ -9,25 +9,25 @@
 #include "chokus.h"
 
 #include <stdlib.h>
-#include <argtable2.h>
-#include <yaml.h>
+#include "argtable2.h"
+#include "yaml.h"
 
 #include "ck_log.h"
 
 
-struct ck_opts {
-    ck_bool foreground;
+struct ckOpts {
+    ckBool foreground;
     bstring configFilename;
     
     int port;
     // Bind address....
     void* bindAddress;
 };
-typedef struct ck_opts ck_opts;
+typedef struct ckOpts ckOpts;
 
-ck_opts gOptions;
+ckOpts gOptions;
 
-typedef void* (*ck_yaml_event_handler)(yaml_event_t* event);
+typedef void* (*ckYamlEventHandler)(yaml_event_t* event);
 
 
 
@@ -68,7 +68,7 @@ void usage(void* argtable[])
 }
 
 
-void ck_parseOpts(int argc, char** argv)
+void ckConfig_ParseOpts(int argc, char** argv)
 {
     int nerrors = 0;
     
@@ -117,11 +117,11 @@ void ck_parseOpts(int argc, char** argv)
     }
     
     // Log everything
-    ck_trace("debug level %d", gLogLevel);
-    ck_trace("foreground = %s", STRING_FROM_BOOL(gOptions.foreground));
+    ck_Trace("debug level %d", gLogLevel);
+    ck_Trace("foreground = %s", STRING_FROM_BOOL(gOptions.foreground));
     if(gOptions.configFilename) 
     {
-        ck_trace("config file = %s", gOptions.configFilename->data);
+        ck_Trace("config file = %s", gOptions.configFilename->data);
     }
     
 }
@@ -135,30 +135,30 @@ int loadConfigFile(bstring filename)
     
     yaml_parser_t parser = {0};
     yaml_event_t event = {0};
-    ck_bool gotEndEvent = FALSE;
-    ck_yaml_event_handler handler = &yehStreamStart;
+    ckBool gotEndEvent = FALSE;
+    ckYamlEventHandler handler = &yehStreamStart;
     
     szFilename = bstr2cstr(filename, '_');
     if (!szFilename)
     {
-        ck_err("Out of memory");
+        ck_Error("Out of memory");
         goto end;
     }
     
     if (!yaml_parser_initialize(&parser))
     {
-        ck_err("Failed to initialize the yaml parser object");
+        ck_Error("Failed to initialize the yaml parser object");
         goto end;
     }
     
     fp = fopen(szFilename, "r");
     if (!fp)
     {
-        ck_debug("Failed to open %s", szFilename);
+        ck_Debug("Failed to open %s", szFilename);
         goto end;
     }
     
-    ck_info("Reading config from %s", szFilename);
+    ck_Info("Reading config from %s", szFilename);
     
     yaml_parser_set_input_file(&parser, fp);
 
@@ -168,7 +168,7 @@ int loadConfigFile(bstring filename)
         // Get the next event
         if (!yaml_parser_parse(&parser, &event))
         {
-            ck_err("yaml_parser_parse returned an error");
+            ck_Error("yaml_parser_parse returned an error");
             goto end;
         }
         
@@ -184,7 +184,7 @@ int loadConfigFile(bstring filename)
         yaml_event_delete(&event);
     }
     
-    ck_debug("Parsing completed");
+    ck_Debug("Parsing completed");
     
 end:
     yaml_parser_delete(&parser);
@@ -206,7 +206,7 @@ int loadConfigFileS(const char* filename)
 /**
  * Loads all configuration files, one after another
  */
-int ck_loadConfig()
+int ckConfig_LoadConfig()
 {
 //    loadConfigFileS("/etc/chokus.yaml");
 //    loadConfigFileS("/etc/chokus/config.yaml");
@@ -224,7 +224,7 @@ int ck_loadConfig()
 
 void logMark(char* name, yaml_mark_t* mark)
 {
-    ck_debug("%s: %d (%d, %d)", name, mark->index, mark->line, mark->column);
+    ck_Debug("%s: %d (%d, %d)", name, mark->index, mark->line, mark->column);
 }
 
 void logEvent(yaml_event_t* event)
@@ -235,47 +235,47 @@ void logEvent(yaml_event_t* event)
             // Intentional
             
         case YAML_NO_EVENT:
-            ck_debug("No event");
+            ck_Debug("No event");
             break;
             
         case YAML_STREAM_START_EVENT:
-            ck_debug("YAML_STREAM_START_EVENT");
+            ck_Debug("YAML_STREAM_START_EVENT");
             break;
             
         case YAML_STREAM_END_EVENT:
-            ck_debug("YAML_STREAM_END_EVENT");
+            ck_Debug("YAML_STREAM_END_EVENT");
             break;
             
         case YAML_DOCUMENT_START_EVENT:
-            ck_debug("YAML_DOCUMENT_START_EVENT");
+            ck_Debug("YAML_DOCUMENT_START_EVENT");
             break;
             
         case YAML_DOCUMENT_END_EVENT:
-            ck_debug("YAML_DOCUMENT_END_EVENT");
+            ck_Debug("YAML_DOCUMENT_END_EVENT");
             break;
             
         case YAML_ALIAS_EVENT:
-            ck_debug("YAML_ALIAS_EVENT");
+            ck_Debug("YAML_ALIAS_EVENT");
             break;
             
         case YAML_SCALAR_EVENT:
-            ck_debug("YAML_SCALAR_EVENT = %s", event->data.scalar.value);
+            ck_Debug("YAML_SCALAR_EVENT = %s", event->data.scalar.value);
             break;
             
         case YAML_SEQUENCE_START_EVENT:
-            ck_debug("YAML_SEQUENCE_START_EVENT");
+            ck_Debug("YAML_SEQUENCE_START_EVENT");
             break;
             
         case YAML_SEQUENCE_END_EVENT:
-            ck_debug("YAML_SEQUENCE_END_EVENT");
+            ck_Debug("YAML_SEQUENCE_END_EVENT");
             break;
             
         case YAML_MAPPING_START_EVENT:
-            ck_debug("YAML_MAPPING_START_EVENT");
+            ck_Debug("YAML_MAPPING_START_EVENT");
             break;
             
         case YAML_MAPPING_END_EVENT:
-            ck_debug("YAML_MAPPING_END_EVENT");
+            ck_Debug("YAML_MAPPING_END_EVENT");
             break;     
     }
     
@@ -291,7 +291,7 @@ struct keyword_map
     
     // If this handler is set it will be installed when this keyword is
     // discovered as a scaler
-    ck_yaml_event_handler handler;
+    ckYamlEventHandler handler;
     
     // If the handler isn't set, but subMap is then it will get pushed
     // onto the keyword map stack
@@ -331,18 +331,18 @@ typedef struct
     
     const char* contextName;
     size_t startColumn;
-    ck_yaml_event_handler higherLevelHandler;
+    ckYamlEventHandler higherLevelHandler;
 } map_node;
 
 static map_node* map_stack = NULL;
 
-void pushMap(const char* name, keyword_map** list, ck_yaml_event_handler higherLevelHandler)
+void pushMap(const char* name, keyword_map** list, ckYamlEventHandler higherLevelHandler)
 {
     map_node* pNode = NULL;
     
     pNode = malloc(sizeof(map_node));
     if (!pNode) {
-        ck_err("Out of memory");
+        ck_Error("Out of memory");
         exit(-1);
     }
     
@@ -376,13 +376,13 @@ void popMap()
 void* yehMappedKeywordsStart(yaml_event_t* event)
 {
     if (!map_stack) {
-        ck_err("yehMappedKeywordsStart called when map_stack was not defined. Returning to stream start");
+        ck_Error("yehMappedKeywordsStart called when map_stack was not defined. Returning to stream start");
         return yehStreamStart;
     }
     
     if (event->type != YAML_MAPPING_START_EVENT)
     {
-        ck_err("%s: Was expecting a map start event but got something else instead", map_stack->contextName);
+        ck_Error("%s: Was expecting a map start event but got something else instead", map_stack->contextName);
         return yehStreamStart;
     }
     
@@ -396,17 +396,17 @@ void* yehMappedKeywordsScalar(yaml_event_t* event)
     keyword_map** cursor = NULL;
     
     if (!map_stack) {
-        ck_err("yehMappedKeywordsScalar called when map_stack was not defined. Returning to stream start");
+        ck_Error("yehMappedKeywordsScalar called when map_stack was not defined. Returning to stream start");
         return yehStreamStart;
     }
     
-    //ck_debug("map_stack->start=%d, e.start=%d", map_stack->startColumn, event->start_mark.column);
+    //ck_Debug("map_stack->start=%d, e.start=%d", map_stack->startColumn, event->start_mark.column);
 
     if (event->start_mark.column == map_stack->startColumn)
     {
         if (event->type == YAML_SCALAR_EVENT)
         {
-            ck_debug("Checking scalar %s", event->data.scalar.value);
+            ck_Debug("Checking scalar %s", event->data.scalar.value);
             
             // We have a scalar at the current map level.
             // Let's see if we recognize what to do with this scalar
@@ -446,7 +446,7 @@ void* yehMappedKeywordsScalar(yaml_event_t* event)
             }
 
             // If we didn't return that means we didn't recognize this keyword
-            ck_info("Ctx(%s) unrecognized keyword: %s", map_stack->contextName, bdata(value));
+            ck_Info("Ctx(%s) unrecognized keyword: %s", map_stack->contextName, bdata(value));
             
             bdestroy(value);
         }
@@ -454,10 +454,10 @@ void* yehMappedKeywordsScalar(yaml_event_t* event)
     else if (event->type == YAML_MAPPING_END_EVENT && event->start_mark.column < map_stack->startColumn)
     {
         // We are done with our mapping so pop up a level
-        ck_yaml_event_handler next = map_stack->higherLevelHandler;
+        ckYamlEventHandler next = map_stack->higherLevelHandler;
         
         popMap();
-        //ck_debug("pop");
+        //ck_Debug("pop");
         return next;
     }
     // else, it was a lower level event that we probably got because something bailed in
@@ -491,7 +491,7 @@ void* yehNetworkBindHost(yaml_event_t* event)
     // Since we only expect one scalar just check for that and handle it
     if (event->type == YAML_SCALAR_EVENT)
     {
-        ck_info("bind = %s", event->data.scalar.value);
+        ck_Info("bind = %s", event->data.scalar.value);
     }
     return yehMappedKeywordsScalar;
 }
@@ -501,13 +501,13 @@ void* yehNetworkBindPort(yaml_event_t* event)
     // Since we only expect one scalar just check for that and handle it
     if (event->type == YAML_SCALAR_EVENT)
     {
-        ck_info("port = %s", event->data.scalar.value);
+        ck_Info("port = %s", event->data.scalar.value);
     }
     return yehMappedKeywordsScalar;
     
 }
 
-ck_bool boolFromStr(yaml_char_t* str)
+ckBool boolFromStr(yaml_char_t* str)
 {
     char c;
     
@@ -517,11 +517,11 @@ ck_bool boolFromStr(yaml_char_t* str)
     return (c == 't' || c == 'T' || c == 'y' || c == 'Y');
 }
 
-ck_logLevel levelFromStr(yaml_char_t* str)
+ckLogLevel levelFromStr(yaml_char_t* str)
 {
     char c;
     
-    if (!str) return CK_LL_ERR;
+    if (!str) return CKLL_ERR;
     
     c = str[0];
     
@@ -529,25 +529,25 @@ ck_logLevel levelFromStr(yaml_char_t* str)
     
     switch (c) {
         case 'e':
-            return CK_LL_ERR;
+            return CKLL_ERR;
             
         case 'w':
-            return CK_LL_WARN;
+            return CKLL_WARN;
 
         case 'i':
-            return CK_LL_INFO;
+            return CKLL_INFO;
             
         case 'd':
-            return CK_LL_DEBUG;
+            return CKLL_DEBUG;
             
         case 't':
-            return CK_LL_TRACE;
+            return CKLL_TRACE;
             
         default:
             break;
     }
     
-    return CK_LL_ERR;
+    return CKLL_ERR;
 }
 
 void* yehLoggingConsoleEnabled(yaml_event_t* event)
@@ -555,7 +555,7 @@ void* yehLoggingConsoleEnabled(yaml_event_t* event)
     // Since we only expect one scalar just check for that and handle it
     if (event->type == YAML_SCALAR_EVENT)
     {
-        ck_enableConsole(boolFromStr(event->data.scalar.value));
+        ckLog_EnableConsole(boolFromStr(event->data.scalar.value));
     }
     return yehMappedKeywordsScalar;
     
@@ -565,7 +565,7 @@ void* yehLoggingConsoleLevel(yaml_event_t* event)
     // Since we only expect one scalar just check for that and handle it
     if (event->type == YAML_SCALAR_EVENT)
     {
-        ck_setConsoleLevel(levelFromStr(event->data.scalar.value));
+        ckLog_SetConsoleLevel(levelFromStr(event->data.scalar.value));
     }
     return yehMappedKeywordsScalar;
 }
@@ -575,7 +575,7 @@ void* yehLoggingSyslogEnabled(yaml_event_t* event)
     // Since we only expect one scalar just check for that and handle it
     if (event->type == YAML_SCALAR_EVENT)
     {
-        ck_enableSyslog(boolFromStr(event->data.scalar.value));
+        ckLog_EnableSyslog(boolFromStr(event->data.scalar.value));
     }
     return yehMappedKeywordsScalar;
     
@@ -585,7 +585,7 @@ void* yehLoggingSyslogLevel(yaml_event_t* event)
     // Since we only expect one scalar just check for that and handle it
     if (event->type == YAML_SCALAR_EVENT)
     {
-        ck_setSyslogLevel(levelFromStr(event->data.scalar.value));
+        ckLog_SetSyslogLevel(levelFromStr(event->data.scalar.value));
     }
     return yehMappedKeywordsScalar;
 }
