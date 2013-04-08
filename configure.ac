@@ -6,5 +6,5 @@ PKG_CHECK_MODULES([YAML], [yaml-0.1])
 PKG_CHECK_MODULES([ARGTABLE], [argtable2])
 
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_FILES([Makefile src/Makefile ])
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile ])
 AC_OUTPUT

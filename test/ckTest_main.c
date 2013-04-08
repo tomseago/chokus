@@ -23,28 +23,6 @@ int testOps();
 
 typedef int (*testFunc)();
 
-int forkAnd(testFunc toRun)
-{
-#ifndef CK_NO_TEST_FORK
-    pid_t kid;
-    
-    kid = fork();
-    if (kid) {
-        // Parent
-        int stat_loc;
-        int options;
-        struct rusage rusage;
-        
-        
-    } else {
-        // Child
-        exit(toRun());
-    }
-#else
-    return toRun();
-#endif
-}
-
 
 
 int main(int argc, char** argv)
@@ -54,8 +32,8 @@ int main(int argc, char** argv)
     ckLog_SetConsoleLevel(CKLL_TRACE);
     gLogLevel = CKLL_TRACE;
     
-    forkAnd(testOps);
+    testOps();
     
-	return 0;
+    return 0;
 }
 
