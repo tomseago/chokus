@@ -305,6 +305,83 @@ error:
 }
 
 
+int testOpsBuckets()
+{
+    ckError err;
+    
+    ckOpType* otSliding = NULL;
+    ckOpLimitRule* ruleSliding = NULL;
+    
+    ckOpLog* log = NULL;
+    
+    ckRuleResult ruleResult;
+    ckTime waitTime;
+    ckTime now;
+    
+    int i;
+    
+    // TODO: Actually implement this function!
+    assert(FALSE);
+    
+    CHK_ERR( ckOpType_Create(&otSliding) );
+    
+//    CHK_ERR( ckOpLimitRule_CreateSliding(&ruleSliding, 2, CKTIME_1SEC, TRUE) );
+//    
+//    CHK_ERR( ckOpType_AddRule(otSliding, ruleSliding) );
+//    ruleSliding = NULL; // Because the type now owns it
+//    
+//    //////////////
+//    CHK_ERR( ckOpLog_Create(&log) );
+//    log->opType = otSliding;
+//    
+//    now = 10;
+//    CHK_ERR( ckOpLog_Log(log, now) );
+//    CHK_ERR( ckOpLog_CheckRules(log, now, &ruleResult, &waitTime) );
+//    assert( ruleResult == ckrrOk );
+//    
+//    // 2nd one within the window is ok, but since this has filled up
+//    // the window, anything that would come in before we got beyond
+//    // the 10+window mark is a violation and will have to wait until
+//    // it is at the 15+window mark to not be a violation
+//    now += 5;
+//    CHK_ERR( ckOpLog_Log(log, now) );
+//    CHK_ERR( ckOpLog_CheckRules(log, now, &ruleResult, &waitTime) );
+//    assert( ruleResult == ckrrOk );
+//    
+//    
+//    // But this 3rd one is no good, so you should wait until the end
+//    // of the window which started with the 1st event
+//    now += 5;
+//    CHK_ERR( ckOpLog_Log(log, now) );
+//    // 2nd on within the window is ok
+//    CHK_ERR( ckOpLog_CheckRules(log, now, &ruleResult, &waitTime) );
+//    assert( ruleResult == ckrrWait );
+//    assert( waitTime == 15 + CKTIME_1SEC + 1 - now);
+//    
+//    // Wait for that long of time before next op happens
+//    now += waitTime;
+//    CHK_ERR( ckOpLog_Log(log, now));
+//    // Should NOT be a violation....
+//    CHK_ERR( ckOpLog_CheckRules(log, now, &ruleResult, &waitTime) );
+//    assert( ruleResult == ckrrOk );
+//    
+//    // And as long as we keep adding 1 second we should be ok
+//    for (i=0; i<3; i++) {
+//        now += CKTIME_1SEC;
+//        CHK_ERR( ckOpLog_Log(log, now));
+//        // Should NOT be a violation....
+//        CHK_ERR( ckOpLog_CheckRules(log, now, &ruleResult, &waitTime) );
+//        assert( ruleResult == ckrrOk );
+//    }
+//    
+//error:
+//    assert( err == cke_Success);
+    ck_Info("ok... testOpsBuckets");
+    
+    ckOpType_Free(&otSliding);
+    ckOpLimitRule_Free(&ruleSliding);
+    return err;
+}
 
 int testOps()
 {
@@ -314,6 +391,8 @@ int testOps()
     
     testOpsSlidingWindow();
     testOpsSlidingWindow2();
+    
+    testOpsBuckets();
     
     return 0;
 }
